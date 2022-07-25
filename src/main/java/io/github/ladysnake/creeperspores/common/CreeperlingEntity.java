@@ -23,7 +23,7 @@ import io.github.ladysnake.creeperspores.mixin.EntityAccessor;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Material;
-import net.minecraft.client.render.entity.feature.ConditionalOverlayOwner;
+import net.minecraft.client.render.entity.feature.SkinOverlayOwner;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -41,7 +41,6 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.OcelotEntity;
@@ -63,8 +62,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.random.RandomGenerator;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LightType;
@@ -79,7 +76,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
-public class CreeperlingEntity extends PathAwareEntity implements ConditionalOverlayOwner {
+public class CreeperlingEntity extends PathAwareEntity implements SkinOverlayOwner {
     private static final TrackedData<Boolean> CHARGED = DataTracker.registerData(CreeperlingEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final int MATURATION_TIME = 20 * 60 * 8;
 
@@ -99,14 +96,14 @@ public class CreeperlingEntity extends PathAwareEntity implements ConditionalOve
         this.goalSelector.add(1, new SwimGoal(this));
         this.goalSelector.add(2, new FleeEntityGoal<>(this, OcelotEntity.class, 6.0F, 1.0D, 1.2D));
         this.goalSelector.add(2, new FleeEntityGoal<>(this, CatEntity.class, 6.0F, 1.0D, 1.2D));
-        this.goalSelector.add(3, new TemptGoal(this, 0.3D, Ingredient.ofTag(CreeperSpores.FERTILIZERS), false));
+        this.goalSelector.add(3, new TemptGoal(this, 0.3D, Ingredient.fromTag(CreeperSpores.FERTILIZERS), false));
         this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.setTrusting(false);
     }
 
     @Override
-    public boolean isOverlayConditionMet() {
+    public boolean shouldRenderOverlay() {
         return this.isCharged();
     }
 
@@ -188,7 +185,7 @@ public class CreeperlingEntity extends PathAwareEntity implements ConditionalOve
             Entity e = player.world.getEntityById(entityId);
             if (e instanceof CreeperlingEntity) {
                 for(int i = 0; i < 15; ++i) {
-                    RandomGenerator random = e.world.random;
+                    Random random = e.world.random;
                     double speedX = random.nextGaussian() * 0.02D;
                     double speedY = random.nextGaussian() * 0.02D;
                     double speedZ = random.nextGaussian() * 0.02D;
@@ -222,7 +219,7 @@ public class CreeperlingEntity extends PathAwareEntity implements ConditionalOve
     }
 
     @Override
-    public int getXpToDrop() {
+    protected int getXpToDrop(PlayerEntity player) {
         return 2 + this.world.random.nextInt(3);
     }
 
@@ -231,7 +228,7 @@ public class CreeperlingEntity extends PathAwareEntity implements ConditionalOve
         // Creeperlings like sunlight
         int skyLightLevel = worldView.getLightLevel(LightType.SKY, pos);
         // method_28516 == getBrightness
-        float skyFavor = computeBrightnessByLightLevel(worldView.getDimension().ambientLight())[skyLightLevel] * 3.0F;
+        float skyFavor = worldView.getDimension().getBrightness(skyLightLevel) * 3.0F;
         // But they can do with artificial light if there is not anything better
         float brightnessAtPos = worldView.method_42309(pos);
         float favor = Math.max(brightnessAtPos, skyFavor);

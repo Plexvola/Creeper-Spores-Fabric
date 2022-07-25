@@ -14,12 +14,6 @@
     "LivingEntityMixin",
     "SpawnHelperMixin"
   ],
-  "client": [
-    "client.AbstractInventoryScreenMixin",
-    "client.EntityRendererAccessor",
-    "client.EntityRendererRegistryMixin",
-    "client.StatusEffectSpriteManagerMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   }
