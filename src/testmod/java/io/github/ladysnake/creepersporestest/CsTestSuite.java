@@ -39,7 +39,7 @@ import net.minecraft.util.math.BlockPos;
 
 public final class CsTestSuite implements FabricGameTest {
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void explosionsTweaksWork(TestContext ctx) {
         var creeper = ctx.spawnMob(EntityType.CREEPER, 1, 0, 1);
         var golem = ctx.spawnMob(EntityType.IRON_GOLEM, 5, 0, 5);
@@ -52,7 +52,7 @@ public final class CsTestSuite implements FabricGameTest {
         ctx.complete();
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void creeperSporesSpawnCreeperlingsOnDamage(TestContext ctx) {
         IronGolemEntity golem = ctx.spawnMob(EntityType.IRON_GOLEM, 1, 0, 1);
         // Spores Level 5 gives a 100% chance to spawn creeperlings on death
@@ -65,7 +65,7 @@ public final class CsTestSuite implements FabricGameTest {
     }
 
     // 60% chance to spawn a creeper => 1 in 10k to fail 10 attempts in a row
-    @GameTest(structureName = EMPTY_STRUCTURE, maxAttempts = 10)
+    @GameTest(templateName = EMPTY_STRUCTURE, maxAttempts = 10)
     public void creeperSporesSpawnCreeperlingsOnComplete(TestContext ctx) {
         IronGolemEntity golem = ctx.spawnMob(EntityType.IRON_GOLEM, 1, 0, 1);
         golem.addStatusEffect(new StatusEffectInstance(CreeperEntry.getVanilla().sporeEffect(), 1));
@@ -75,7 +75,7 @@ public final class CsTestSuite implements FabricGameTest {
         });
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void creeperlingsGrowWithBonemeal(TestContext ctx) {
         CreeperlingEntity creeperling = ctx.spawnMob(CreeperEntry.getVanilla().creeperlingType(), 1, 0, 1);
         creeperling.setCustomName(Text.of("Bobby"));
@@ -91,7 +91,7 @@ public final class CsTestSuite implements FabricGameTest {
         });
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void creepersBurnMore(TestContext ctx) {
         var creeper = ctx.spawnMob(EntityType.CREEPER, 1, 0, 1);
         var golem = ctx.spawnMob(EntityType.IRON_GOLEM, 2, 0, 2);

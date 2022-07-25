@@ -41,6 +41,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.OcelotEntity;
@@ -62,6 +63,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LightType;
@@ -73,7 +76,6 @@ import net.minecraft.world.WorldView;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
 public class CreeperlingEntity extends PathAwareEntity implements SkinOverlayOwner {
@@ -219,7 +221,7 @@ public class CreeperlingEntity extends PathAwareEntity implements SkinOverlayOwn
     }
 
     @Override
-    protected int getXpToDrop(PlayerEntity player) {
+    public int getXpToDrop() {
         return 2 + this.world.random.nextInt(3);
     }
 
@@ -228,9 +230,9 @@ public class CreeperlingEntity extends PathAwareEntity implements SkinOverlayOwn
         // Creeperlings like sunlight
         int skyLightLevel = worldView.getLightLevel(LightType.SKY, pos);
         // method_28516 == getBrightness
-        float skyFavor = worldView.getDimension().getBrightness(skyLightLevel) * 3.0F;
+        float skyFavor = computeBrightnessByLightLevel(worldView.getDimension().ambientLight())[skyLightLevel] * 3.0F;
         // But they can do with artificial light if there is not anything better
-        float brightnessAtPos = worldView.method_42309(pos);
+        float brightnessAtPos = worldView.getBrightness(pos);
         float favor = Math.max(brightnessAtPos, skyFavor);
         // They like good soils too
         if (worldView.getBlockState(pos.down(1)).isIn(BlockTags.BAMBOO_PLANTABLE_ON)) {
